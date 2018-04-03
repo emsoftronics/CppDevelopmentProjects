@@ -1,12 +1,10 @@
 
 
-
-
-SRC_DIR := ${PWD}
+SRC_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 OBJ_DIR := $(TOP_DIR)/out/obj$(subst $(TOP_DIR),,$(SRC_DIR))
 VPATH := $(OBJ_DIR)
 
-SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+SRC_FILES := $(wildcard $(SRC_DIR)*.cpp)
 OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 
 ## Fix dependency destination to be ../.dep relative to the src dir
@@ -15,11 +13,31 @@ OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 all:
 	@echo Executing $(SRC_DIR)/Makefile
 
+dynamic_lib:$(TOP_DIR)/libs/dynamic/lib
+	@echo building dynamic lib at $<
+
+$(TOP_DIR)/libs/dynamic/lib:
+	mkdir -p $@
+
+static_lib:$(TOP_DIR)/libs/static/lib
+	@echo building static lib at $<
+
+$(TOP_DIR)/libs/static/lib:
+	mkdir -p $@
+
+object_files: $(OBJ_FILES)
+	@echo source path $(SRC_DIR) and obj_path $(OBJ_DIR)
+	@echo  creating object files $(OBJ_FILES) $(SRC_FILES)
+
 $(OBJ_FILES): | $(OBJ_DIR)
 
 $(OBJ_DIR):
-	@mkdir -p $@
+	mkdir -p $@
 
 $(OBJ_DIR)/%.o : %.cpp
 	@echo cxx $@ 
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
+	@touch $@
+	#@$(CXX) $(CXXFLAGS) -c $< -o $@
+
+clean:
+	@echo cleaning $(OBJ_DIR)
