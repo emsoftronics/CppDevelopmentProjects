@@ -1,0 +1,25 @@
+
+
+
+
+SRC_DIR := ${PWD}
+OBJ_DIR := $(TOP_DIR)/out/obj$(subst $(TOP_DIR),,$(SRC_DIR))
+VPATH := $(OBJ_DIR)
+
+SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
+
+## Fix dependency destination to be ../.dep relative to the src dir
+#DEP_FILES=$(join $(addsuffix ../.dep/, $(dir $(SOURCE))), $(notdir $(SOURCE:.cpp=.d)))
+
+all:
+	@echo Executing $(SRC_DIR)/Makefile
+
+$(OBJ_FILES): | $(OBJ_DIR)
+
+$(OBJ_DIR):
+	@mkdir -p $@
+
+$(OBJ_DIR)/%.o : %.cpp
+	@echo cxx $@ 
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
